@@ -18,7 +18,7 @@ from sklearn.metrics import accuracy_score  # 模型准确度
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # parameters:
-    column_selection_condition = 1
+    column_selection_condition = 2
     test_sample_size = 0.2
     tree_depth = 4
     tree_criterion = 'entropy'
@@ -53,8 +53,10 @@ if __name__ == '__main__':
         len(y_test[y_test == False]))+"例")
     model = dtc(criterion=tree_criterion, max_depth=tree_depth)
     model.fit(x_train, y_train)  # 训练数据
-    pred_model = model.predict(x_test)
-    print(cl('Accuracy of the model is {:.0%}'.format(accuracy_score(y_test, pred_model)), attrs=['bold']))
+    pred_train = model.predict(x_train)
+    pred_test = model.predict(x_test)
+    print(cl('Accuracy of train is {:.0%}'.format(accuracy_score(y_train, pred_train)), attrs=['bold']))
+    print(cl('Accuracy of test is {:.0%}'.format(accuracy_score(y_test, pred_test)), attrs=['bold']))
 
     # 绘图
     feature_names = df.columns.to_list()[0:len(df.columns.to_list())]
@@ -67,13 +69,30 @@ if __name__ == '__main__':
     # 计算混淆矩阵
     from sklearn.metrics import confusion_matrix
 
-    cm = confusion_matrix(y_test, pred_model, labels=[True, False])  # True代表患者，False代表健康
-    print("混淆矩阵：\n", cm)
+    cm = confusion_matrix(y_train, pred_train, labels=[True, False])  # True代表患者，False代表健康
+    print("训练混淆矩阵：\n", cm)
+
+    cm = confusion_matrix(y_test, pred_test, labels=[True, False])  # True代表患者，False代表健康
+    print("测试混淆矩阵：\n", cm)
 
     # 计算ROC 和 AUC
     from sklearn.metrics import roc_curve
     from sklearn import metrics
     import matplotlib.pyplot as plt
+
+    fpr_train, tpr_train, thresholds_train = roc_curve(y_train, model.predict_proba(x_train)[:, 1])
+    auc_train = metrics.auc(fpr_train, tpr_train)
+    plt.xlim((-0.01, 1.02))
+    plt.ylim((-0.01, 1.02))
+    plt.xticks(np.arange(0, 1.1, 0.1))
+    plt.yticks(np.arange(0, 1.1, 0.1))
+    plt.plot(fpr_train, tpr_train, 'r-', lw=2, label='AUC=%.4f' % auc_train)
+    plt.legend(loc='lower right')
+    plt.xlabel('False Positive Rate', fontsize=14)
+    plt.ylabel('True Positive Rate', fontsize=14)
+    plt.grid(visible=True, ls=':')
+    plt.title(u'DecisionTree ROC curve And AUC (Train)', fontsize=18)
+    plt.show()
 
     fpr, tpr, thresholds = roc_curve(y_test, model.predict_proba(x_test)[:, 1])
     auc = metrics.auc(fpr, tpr)
