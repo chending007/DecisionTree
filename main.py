@@ -29,7 +29,7 @@ if __name__ == '__main__':
     df.columns = df.iloc[0, :]
     df = df.iloc[1:len(df), :]
     df_column_mean = df.mean()
-    df.drop(df_column_mean[df_column_mean < column_selection_condition].index, axis=1)
+    df = df.drop(df_column_mean[df_column_mean < column_selection_condition].index, axis=1)
     ill = pd.DataFrame(data=df.index, columns=['ill_condition'])  # 向量形式
     ill_matrix = np.empty([len(df.index) - 1, 2], dtype='bool')
     x_vars = df[df.columns.to_list()].values
@@ -43,6 +43,14 @@ if __name__ == '__main__':
 
     # 拆分训练集和测试集
     x_train, x_test, y_train, y_test = train_test_split(x_vars, y_vars, test_size=test_sample_size, random_state=0)
+    print("清洗后数据共计" + str(len(y_vars)) + "例，其中患者" + str(len(y_vars[y_vars == True])) + "例，非患者" + str(
+        len(y_vars[y_vars == False])) + "例")
+    print("测试集数据共计" + str(len(y_test)) + "例，其中患者" + str(len(y_test[y_test == True])) + "例，非患者" + str(
+        len(y_test[y_test == False])) + "例")
+    print("训练集数据共计" + str(len(y_train)) + "例，其中患者" + str(len(y_train[y_train == True])) + "例，非患者" + str(
+        len(y_train[y_train == False])) + "例")
+    print("测试集数据共计"+str(len(y_test))+"例，其中患者"+str(len(y_test[y_test == True]))+"例，非患者"+str(
+        len(y_test[y_test == False]))+"例")
     model = dtc(criterion=tree_criterion, max_depth=tree_depth)
     model.fit(x_train, y_train)  # 训练数据
     pred_model = model.predict(x_test)
