@@ -43,6 +43,15 @@ if __name__ == '__main__':
 
     # 拆分训练集和测试集
     x_train, x_test, y_train, y_test = train_test_split(x_vars, y_vars, test_size=test_sample_size, random_state=0)
+    save_x_train = pd.DataFrame(columns=df.columns, data=x_train)
+    save_x_test = pd.DataFrame(columns=df.columns, data=x_test)
+    save_y_train = pd.DataFrame(data=y_train)
+    save_y_test = pd.DataFrame(data=y_test)
+    save_x_train.to_csv('./x_train.csv')
+    save_x_test.to_csv('./x_test.csv')
+    save_y_train.to_csv('./y_train.csv')
+    save_y_test.to_csv('./y_test.csv')
+
     print("清洗后数据共计" + str(len(y_vars)) + "例，其中患者" + str(len(y_vars[y_vars == True])) + "例，非患者" + str(
         len(y_vars[y_vars == False])) + "例")
     print("测试集数据共计" + str(len(y_test)) + "例，其中患者" + str(len(y_test[y_test == True])) + "例，非患者" + str(
@@ -105,7 +114,7 @@ if __name__ == '__main__':
     plt.xlabel('False Positive Rate', fontsize=14)
     plt.ylabel('True Positive Rate', fontsize=14)
     plt.grid(visible=True, ls=':')
-    plt.title(u'DecisionTree ROC curve And AUC', fontsize=18)
+    plt.title(u'DecisionTree ROC curve And AUC (Test)', fontsize=18)
     plt.show()
 
     # 一种绘图方式
